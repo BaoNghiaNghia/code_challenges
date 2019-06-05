@@ -1,7 +1,7 @@
 const path = require('path');
 
 const config = {
-  entry: './src/index.js',
+  entry: ['babel-polyfill', './src/index.js'],
   output: {
     filename: '[name].js',
     path: path.resolve(__dirname, 'build'),
@@ -13,7 +13,7 @@ const config = {
   devServer: {
     inline: true,
     host: '0.0.0.0',
-    port: 3000,
+    port: 3005,
     historyApiFallback: true,
     disableHostCheck: true,
     contentBase: 'public',
@@ -26,7 +26,7 @@ const config = {
         loader: 'babel-loader',
         exclude: /node_modules/,
         query: {
-          presets: ['react', 'es2015'],
+          presets: ['react', 'es2015', 'stage-0'],
           plugins: ['transform-class-properties']
         }
       }

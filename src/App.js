@@ -1,17 +1,18 @@
-import React, { Component } from "react";
-import { connect } from "react-redux";
-import styled from "styled-components";
-import Card from "../src/components/Card";
-import fetch from "isomorphic-fetch";
-
-import { summaryDonations } from "./helpers";
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import styled from 'styled-components';
+import Card from '../src/components/Card';
+import { getCharities } from './api/CharitiesApi'
+import { getPayments, payment } from './api/PaymentsApi'
+import { summaryDonations } from './helpers';
+import * as action from './reducers/action'
 
 const style = {
-  color: "red",
-  margin: "1em 0",
-  fontWeight: "bold",
-  fontSize: "16px",
-  textAlign: "center"
+  color: 'red',
+  margin: '1em 0',
+  fontWeight: 'bold',
+  fontSize: '16px',
+  textAlign: 'center'
 };
 
 class App extends Component {
@@ -24,62 +25,29 @@ class App extends Component {
     };
   }
 
-  componentDidMount() {
-    const self = this
-    fetch("http://localhost:3001/charities")
-      .then(function(resp) {
-        return resp.json();
-      })
-      .then(function(data) {
-        self.setState({ charities: data });
-      });
-
-    fetch("http://localhost:3001/payments")
-      .then(function(resp) {
-        return resp.json();
-      })
-      .then(function(data) {
-        self.props.dispatch({
-          type: "UPDATE_TOTAL_DONATE",
-          payload: summaryDonations(data.filter(item => item.amount).map(item => item.amount))
-        });
-      });
+  async componentDidMount() {
+    const charities = await getCharities()
+    this.setState( charities )
+    const payments = await getPayments()
+    this.props.updateTotalDonate(summaryDonations(payments.filter(item => item.amount).map(item => item.amount)))
   }
 
   handlePayment = (amount) => {
     this.setState({ selectedAmount: amount })
   }
 
-  handlePay = (id, currency) => {
+  handlePay = async (id, curency) => {
     const { selectedAmount } = this.state
-    fetch("http://localhost:3001/payments", {
-      method: "POST",
-      body: `{ "charitiesId": ${id}, "amount": ${selectedAmount}, "currency": "${currency}" }`
-    })
-      .then(resp => resp.json())
-      .then(() => {
-        this.props.dispatch({
-          type: "UPDATE_TOTAL_DONATE",
-          payload: selectedAmount
-        });
-        this.props.dispatch({
-          type: "UPDATE_MESSAGE",
-          message: `Thanks for donate ${selectedAmount}!`
-        });
-
-        setTimeout(() => {
-          this.props.dispatch({
-            type: "UPDATE_MESSAGE",
-            message: ""
-          });
-        }, 2000);
-      });
+    await payment({ id, amount: selectedAmount, curency})
+    this.props.updateTotalDonate(selectedAmount)
+    this.props.updateMessage(`Thanks for donate ${selectedAmount}!`);
+    setTimeout(() => {
+      this.props.updateMessage(``);
+    }, 2000);
   }
 
   render() {
-   
-    const donate = this.props.donate;
-    const message = this.props.message;
+    const { donate, message } = this.props;
 
     return (
       <div>
@@ -94,5 +62,15 @@ class App extends Component {
     );
   }
 }
-
-export default connect(state => state)(App);
+const mapDispatchToProps = dispatch => ({
+  updateTotalDonate: (payments) => dispatch(action.updateDonate(payments)),
+  updateMessage: (message) => dispatch(action.updateMessage(message))
+})
+const mapStateToProps = state => ({
+  donate: state.donate ,
+  message: state.message
+})
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(App);
