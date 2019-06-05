@@ -7,13 +7,15 @@ const Content = styled.div`
 `;
 
 const Card = ({ handlePay, item, handlePayment }) => {
-  const payments = [10, 20, 50, 100, 500].map((amount, j) => (
+  const paymentRange = [10, 20, 50, 100, 500];
+
+  const payments = paymentRange.map((amount, j) => (
     <label key={j}>
       <input
         type="radio"
         name="payment"
         onClick={() => handlePayment(amount)}
-      />{" "}
+      />{' '}
       {amount}
     </label>
   ));

@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import styled from 'styled-components';
 import Card from '../src/components/Card';
 import { getCharities } from './api/CharitiesApi'
 import { getPayments, payment } from './api/PaymentsApi'
@@ -27,9 +26,9 @@ class App extends Component {
 
   async componentDidMount() {
     const charities = await getCharities()
-    this.setState( charities )
+    this.setState({charities})
     const payments = await getPayments()
-    this.props.updateTotalDonate(summaryDonations(payments.filter(item => item.amount).map(item => item.amount)))
+    this.props.updateTotalDonate(summaryDonations(payments.filter((item) => item.amount).map(item => item.amount)))
   }
 
   handlePayment = (amount) => {
@@ -48,16 +47,16 @@ class App extends Component {
 
   render() {
     const { donate, message } = this.props;
-
     return (
       <div>
         <h1>Tamboon React</h1>
         <p>All donations: {donate}</p>
         <p style={style}>{message}</p>
-        { 
-          this.state.charities.map((item, i) => 
+        {
+          this.state.charities.map((item, i) =>
             <Card key={i} item={item} handlePay={this.handlePay} handlePayment={this.handlePayment} />
-          )}
+          )
+        }
       </div>
     );
   }
