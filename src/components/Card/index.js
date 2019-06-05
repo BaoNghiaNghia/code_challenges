@@ -22,10 +22,11 @@ const Card = ({ handlePay, item, handlePayment }) => {
 
   return (
     <Content>
+      <img src={'../../images/' + item.image }></img>
       <p>{item.name}</p>
       {payments}
       <button
-        onClick={() => handlePay(item.id, item.curencys)}
+        onClick={() => handlePay(item.id, item.currency)}
       >
         Pay
       </button>
