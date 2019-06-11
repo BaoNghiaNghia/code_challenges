@@ -37,11 +37,12 @@ class App extends Component {
 
   handlePay = async (id, curency) => {
     const { selectedAmount } = this.state
+
     await payment({ id, amount: selectedAmount, curency})
     console.log(selectedAmount)
     this.props.updateTotalDonate(selectedAmount)
     this.props.updateMessage(`Thanks for donate ${selectedAmount}!`);
-    clearTimeout()
+    
     setTimeout(() => {
       this.props.updateMessage(``);
     }, 2000);

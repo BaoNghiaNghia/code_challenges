@@ -26,6 +26,7 @@ const Card = ({ handlePay, item, handlePayment }) => {
       <p>{item.name}</p>
       {payments}
       <button
+        className=""
         onClick={() => handlePay(item.id, item.currency)}
       >
         Pay
